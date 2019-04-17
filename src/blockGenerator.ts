@@ -1,9 +1,9 @@
-import { EthereumHeader, decodeBlock, EthereumTransaction, CONTRACT_CREATION } from '@rainblock/ethereum-block'
+import { EthereumHeader, decodeBlock, EthereumTransaction, CONTRACT_CREATION } from '@rainblock/ethereum-block';
 import { ConfigurationFile } from './configFile';
-import { encodeBlock, encodeHeaderAsRLP } from '@rainblock/ethereum-block'
+import { encodeBlock, encodeHeaderAsRLP } from '@rainblock/ethereum-block';
 import { RlpList, RlpEncode, RlpDecode } from 'rlp-stream/build/src/rlp-stream';
 import { EthereumAccount, EthereumAccountFromBuffer } from './ethereumAccount';
-import { VerifierStorageClient, UpdateMsg, grpc, UpdateOp, StorageUpdate, TransactionReply, ErrorCode} from '@rainblock/protocol'
+import { VerifierStorageClient, UpdateMsg, grpc, UpdateOp, StorageUpdate, TransactionReply, ErrorCode} from '@rainblock/protocol';
 import { MerklePatriciaTree, CachedMerklePatriciaTree, MerklePatriciaTreeOptions, MerklePatriciaTreeNode } from '@rainblock/merkle-patricia-tree';
 import { GethStateDump, GethStateDumpAccount, ImportGethDump } from './gethImport';
 
@@ -19,9 +19,9 @@ export interface BlockGeneratorOptions {
     /** The maximum amount of time the proof of work puzzle takes to solve */
     proofOfWorkTime: number;
     /** The configuration from the configuration file */
-    config: ConfigurationFile
+    config: ConfigurationFile;
     /** The configuratino file directory */
-    configDir : string
+    configDir : string;
 }
 
 /** Transaction data for processing the transaction and including it in the block. */
@@ -63,7 +63,7 @@ interface ExecutionResult {
     /** The timestamp selected for this transaction. */
     timestamp: bigint;
     /** The ordering of transactions in this execution. */
-    order : TransactionData[]
+    order : TransactionData[];
     /** The number of nanoseconds it took to order and execute the transactions. */
     executionTime: bigint;
     /** The write set, keyed by address */
@@ -90,7 +90,7 @@ export class BlockGenerator {
 
     private txQueue : TransactionData[] = [];
 
-    constructor(private logger: Logger, public options : BlockGeneratorOptions, public running: boolean = true) {
+    constructor(private logger: Logger, public options : BlockGeneratorOptions, public running = true) {
         this.blockNumber = 0n;
         this.parentHash = 0n;
         this.difficulty = 0n;
@@ -140,7 +140,7 @@ export class BlockGenerator {
             hashedAddress,
             nonce: account.nonce,
             balance: account.balance
-        })
+        });
 
         // TODO: defer update tree until end
         this.tree.putWithNodeBag(hashedAddress, account, usedNodes, nodeBag);
@@ -152,7 +152,7 @@ export class BlockGenerator {
         const writeSet = new Map<bigint, WriteSetChanges>();
         const nodesUsed = new Set<bigint>();
         const start = process.hrtime.bigint();
-        let gasUsed = 0n;
+        const gasUsed = 0n;
         let i = 0;
         for (const tx of transactions) {
             i++;
@@ -235,13 +235,13 @@ export class BlockGenerator {
         this.logger.debug(`Executed new block ${this.blockNumber} with new root ${stateRoot.toString(16)} using ${gasUsed} gas`);
 
         return {
-            stateRoot: stateRoot,
-            gasUsed: gasUsed,
+            stateRoot,
+            gasUsed,
             timestamp: BigInt(Date.now()),
             order,
             writeSet,
             executionTime: process.hrtime.bigint() - start
-        }
+        };
     }
 
     /** Calculate the transactions root based on the ordering given. */
@@ -309,13 +309,13 @@ export class BlockGenerator {
             await new Promise((resolve, reject) => {
                 this.verifiers[i].waitForReady(Date.now() + this.options.config.rpc.storageTimeout, (error=> {
                 if (error) {
-                    this.logger.warn(`Shard ${i} connection failed: storage node at ${storageNodeAddress}: ${error}`)
-                    reject(new Error(`Failed to connect to shard ${i} at ${storageNodeAddress}`))
+                    this.logger.warn(`Shard ${i} connection failed: storage node at ${storageNodeAddress}: ${error}`);
+                    reject(new Error(`Failed to connect to shard ${i} at ${storageNodeAddress}`));
                 } else {
                     this.logger.info(`Shard ${i} connected to storage node at ${storageNodeAddress}`);
                     resolve();
                 }
-            }))
+            }));
             });
         }
     }
@@ -337,7 +337,7 @@ export class BlockGenerator {
         this.tree.pruneStateCache();
 
         if (this.tree.rootHash != genesisBlock.header.stateRoot) {
-            throw new Error(`Genesis root from block (${genesisBlock.header.stateRoot.toString(16)}) does not match imported root ${this.tree.rootHash.toString(16)}`)
+            throw new Error(`Genesis root from block (${genesisBlock.header.stateRoot.toString(16)}) does not match imported root ${this.tree.rootHash.toString(16)}`);
         }
 
         this.logger.info(`Initialized state to stateRoot ${this.tree.rootHash.toString(16)}`);

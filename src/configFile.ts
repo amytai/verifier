@@ -1,8 +1,8 @@
 /** An interface which defines the contents of the parsed YAML configuration file. */
 export interface ConfigurationFile {
-    storage: StorageNodes
+    storage: StorageNodes;
     verifiers: string[];
-    rpc: RpcSettings
+    rpc: RpcSettings;
     /** Hex string indicating account number of beneficiary */
     beneficiary: string;
     /** Block reward size, in wei */

@@ -1,6 +1,6 @@
 import {  IVerifierStorageServer, 
     IStorageNodeServer,
-    UpdateMsg, google_protobuf_empty_pb, grpc, CodeRequest, CodeReply, AccountRequest, AccountReply, StorageRequest, StorageReply, BlockHashRequest, BlockHashReply, RPCWitness} from '@rainblock/protocol'
+    UpdateMsg, google_protobuf_empty_pb, grpc, CodeRequest, CodeReply, AccountRequest, AccountReply, StorageRequest, StorageReply, BlockHashRequest, BlockHashReply, RPCWitness} from '@rainblock/protocol';
 import { MerklePatriciaTree } from '@rainblock/merkle-patricia-tree/build/src';
 import { GethStateDump, ImportGethDump } from './gethImport';
 import { EthereumAccount } from './ethereumAccount';
@@ -38,12 +38,12 @@ export class DummyStorageServer implements IVerifierStorageServer, IStorageNodeS
     async getAccount(call: grpc.ServerUnaryCall<AccountRequest>,
         callback: grpc.sendUnaryData<AccountReply>) {
             this.logger.debug(`Got account message from ${call.getPeer()}`);
-            let accountBuffer = call.request.getAddress_asU8();
-            let account = this.tree.get(hashAsBuffer(HashType.KECCAK256, Buffer.from(accountBuffer)));
-            let reply = new AccountReply();
+            const accountBuffer = call.request.getAddress_asU8();
+            const account = this.tree.get(hashAsBuffer(HashType.KECCAK256, Buffer.from(accountBuffer)));
+            const reply = new AccountReply();
             reply.setExists(account.value === null);
             if (account.value !== null) {
-                let rpcWitness = new RPCWitness();
+                const rpcWitness = new RPCWitness();
                 rpcWitness.setValue(account.value.toRlp());
                 rpcWitness.setProofListList(account.proof.map(n => n.getRlpNodeEncoding({
                     keyConverter: k => k as Buffer,

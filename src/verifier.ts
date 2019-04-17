@@ -8,7 +8,7 @@ import * as yaml from 'js-yaml';
 
 import { VerifierServer } from './verifierService';
 import { DummyStorageServer } from './dummyStorageService';
-import { VerifierService, VerifierClient, TransactionRequest, TransactionReply, StorageNodeService, VerifierStorageService, grpc } from '@rainblock/protocol'
+import { VerifierService, VerifierClient, TransactionRequest, TransactionReply, StorageNodeService, VerifierStorageService, grpc } from '@rainblock/protocol';
 import { BlockGenerator } from './blockGenerator';
 import { ConfigurationFile } from './configFile';
 import { RlpDecoderTransform, RlpEncode, RlpDecode, RlpList } from 'rlp-stream/build/src/rlp-stream';
@@ -31,7 +31,7 @@ program.version('1').description('The rainblock verifier server')
     .option('--beneficiary <address>', 'The <address> of the beneficiary. If set, overrides any beneficary set in the config.', program.STRING)
     .option('--pow <time>', 'The maximum <time> in ms the proof of work puzzle takes to solve', program.INTEGER, 12000)
     .action(async (a, o, l) => {
-        let config = yaml.safeLoad(await fs.promises.readFile(o['config'], "utf8")) as ConfigurationFile;
+        const config = yaml.safeLoad(await fs.promises.readFile(o['config'], "utf8")) as ConfigurationFile;
 
         if (o['beneficiary']) {
             config.beneficiary = o['beneficiary'];
@@ -127,7 +127,7 @@ program.command('test-transaction-list', 'Send a list of test transactions')
     
             let promises = [];
             const start = process.hrtime.bigint();
-            let i = 0;
+            const i = 0;
             for await (const tx of decoder) {
                 request.setTransaction(RlpEncode(tx));
                 const promise = new Promise((resolve, reject) => {
@@ -169,7 +169,7 @@ program.command('generate-genesis', 'Generate a genesis file and block with test
         const json : GethStateDump = {
             root: "",
             accounts: {}
-        }
+        };
         const map : { [private_key : string] : string} = {};
         while (private_key < (BigInt(o['accounts']) + 1n)) {
             const address = await getPublicAddress(private_key);
@@ -233,7 +233,7 @@ program.command('generate-trace', 'Generate a transaction trace file using the p
             const nonce = nonceMap.has(fromAccountNum) ? nonceMap.get(fromAccountNum)! + 1n : 0n;
             nonceMap.set(fromAccountNum, nonce); 
 
-            let transaction : EthereumTransaction  = {
+            const transaction : EthereumTransaction  = {
                 gasLimit: BigInt(o['gasLimit']),
                 to,
                 data: Buffer.from([]),
@@ -241,7 +241,7 @@ program.command('generate-trace', 'Generate a transaction trace file using the p
                 gasPrice: BigInt(o['gasPrice']),
                 value: BigInt(o['value']),
                 from: 0n // Discarded
-            }
+            };
             
             const signedTx = signTransaction(transaction, fromAccountNum, o['chain']);
             const rlp = RlpEncode(signedTx);
@@ -282,7 +282,7 @@ program.command('submit-tx', 'Submit a transaction using parameters given.')
         // Sign the transaction and generate the binary
         const signedTransaction = signTransaction(transaction, toBigIntBE(Buffer.from(keyPadded, 'hex')), o['chain']);
         const txBinary = RlpEncode(signedTransaction);
-        let proof = [];
+        const proof = [];
 
         // Generate the proof (for simple tx only)
         if (o['proof']) {
@@ -311,7 +311,7 @@ program.command('submit-tx', 'Submit a transaction using parameters given.')
                     putCanDelete: false}));
                 const fullBytes = proofs.reduce((p, c, i) => p + c.length, 0);
                 l.debug(`Proofs total size: ${fullBytes}`);
-                const hashes : bigint[] = [];
+                const hashes : Array<bigint> = [];
                 const reduced = [];
                 for (const proof of proofs) {
                     const hash = hashAsBigInt(HashType.KECCAK256, proof);
@@ -374,7 +374,7 @@ program.command('proof-size', 'Calculate the sizes of proofs using varying param
             for (let depth = 10; depth >= 0; depth--) {
                 const depthData : any = {};
                 
-                const sliced = converted.map(m => m.length > depth ? m.slice(depth) : [m[m.length - 1]]) // preserve the last proof
+                const sliced = converted.map(m => m.length > depth ? m.slice(depth) : [m[m.length - 1]]); // preserve the last proof
 
                 // for 2-ADDRESS_COUNT...
                 for (let totalAccounts = 2; totalAccounts < ADDRESS_COUNT + 1; totalAccounts++) {
@@ -396,7 +396,7 @@ program.command('proof-size', 'Calculate the sizes of proofs using varying param
                     callData.prunedBytes = fullBytes;
 
                     l.debug(`${accounts} ${depth} ${totalAccounts} Proofs total size: pruned ${fullBytes} vs unpruned ${unprunedBytes} (${((1 - (fullBytes/unprunedBytes)) * 100).toFixed(2)}%)`);
-                    const hashes : bigint[] = [];
+                    const hashes : Array<bigint> = [];
                     const reduced = [];
                     for (const proof of proofs) {
                         const hash = hashAsBigInt(HashType.KECCAK256, proof);

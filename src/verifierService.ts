@@ -1,5 +1,5 @@
-import {  TransactionRequest, TransactionReply, IVerifierServer, ErrorCode, grpc, VerifierVerifierHandshakeMessage, MerkleNodeAdvertisement, BlockAdvertisement, NeighborAdvertisement} from '@rainblock/protocol'
-import { decodeTransaction, CONTRACT_CREATION } from '@rainblock/ethereum-block'
+import {  TransactionRequest, TransactionReply, IVerifierServer, ErrorCode, grpc, VerifierVerifierHandshakeMessage, MerkleNodeAdvertisement, BlockAdvertisement, NeighborAdvertisement} from '@rainblock/protocol';
+import { decodeTransaction, CONTRACT_CREATION } from '@rainblock/ethereum-block';
 import { RlpDecode, RlpList } from 'rlp-stream';
 import { BlockGenerator, AccountUpdates } from './blockGenerator';
 import { hashAsBigInt, hashAsBuffer, HashType } from 'bigint-hash';
@@ -62,7 +62,7 @@ export class VerifierServer implements IVerifierServer {
         } catch (e) {
             this.logger.error(`Failed to process transaction from ${call.getPeer()} - ${e instanceof Error ? e.message : e}`);
             // Some error occurred. Log it, and then return error to the client
-            let r = new TransactionReply();
+            const r = new TransactionReply();
             r.setCode(ErrorCode.ERROR_CODE_INVALID);
             callback(null, r);
         }
